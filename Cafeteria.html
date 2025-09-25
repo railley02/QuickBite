@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBite - Customer & Vendor Views</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px 8px;
+            font-size: 14px;
+            font-weight: 600;
+            background: white;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .time {
+            color: #000;
+        }
+        
+        .battery {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #000;
+        }
+        
+        .view-switcher {
+            position: absolute;
+            top: 45px;
+            left: 20px;
+            right: 20px;
+            z-index: 15;
+            display: flex;
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            padding: 4px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .view-option {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+        
+        .view-option.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .app-content {
+            height: calc(100% - 40px);
+            overflow-y: auto;
+            position: relative;
+            margin-top: 60px;
+        }
+        
+        .view-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .view-container.hidden {
+            opacity: 0;
+            transform: translateX(-100%);
+            pointer-events: none;
+        }
+        
+        .view-container.slide-right {
+            transform: translateX(100%);
+        }
+        
+        /* Customer View Styles */
+        .customer-view {
+            background: #fff;
+        }
+        
+        .customer-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .customer-header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: white;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .customer-content {
+            padding: 30px 20px 100px;
+        }
+        
+        .quick-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 16px;
+            text-align: center;
+            flex: 1;
+            margin: 0 5px;
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);
+        }
+        
+        .stat-number {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .featured-cafeteria {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .cafeteria-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .cafeteria-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #27ae60;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .status-text {
+            color: #27ae60;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .wait-time {
+            background: rgba(255,255,255,0.7);
+            padding: 8px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 18px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #8b5a3c;
+            box-shadow: 0 8px 20px rgba(252, 182, 159, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .feature-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .feature-desc {
+            font-size: 12px;
+            color: #7f8c8d;
+            line-height: 1.4;
+        }
+        
+        .floating-order {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .floating-order:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Vendor View Styles */
+        .vendor-view {
+            background: #f8f9fa;
+        }
+        
+        .vendor-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .vendor-header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: #f8f9fa;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .vendor-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .vendor-details h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .vendor-status {
+            font-size: 14px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #27ae60;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .toggle-status {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-status:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .vendor-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .vendor-stat-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            flex: 1;
+            margin: 0 3px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .vendor-content {
+            padding: 30px 20px 100px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .section-action {
+            color: #3498db;
+            font-size: 14px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .order-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin-right: 15px;
+        }
+        
+        .order-details {
+            flex: 1;
+        }
+        
+        .order-customer {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 2px;
+        }
+        
+        .order-items {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 2px;
+        }
+        
+        .order-time {
+            font-size: 12px;
+            color: #95a5a6;
+        }
+        
+        .order-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-preparing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .inventory-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 1px solid #f8f9fa;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .inventory-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .inventory-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .item-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        
+        .item-details h4 {
+            color: #2c3e50;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+        
+        .item-price {
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+        
+        .item-stock {
+            text-align: right;
+        }
+        
+        .stock-number {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .stock-status {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        
+        .stock-high {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .stock-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .stock-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .emergency-alert {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .alert-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .alert-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .vendor-action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .vendor-btn-primary {
+            background: linear-gradient(135deg, #27ae60, #219a52);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .vendor-btn-secondary {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+        
+        .bottom-nav {
+            position: absolute;  /* instead of fixed */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background: #fff;
+            border-top: 1px solid #ddd;
+            padding: 8px 0;
+            z-index: 1000;
+            border-radius: 0 0 32px 32px; /* match screen’s rounded bottom */
+}
+        .nav-item .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-item.active {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        /* prevents content from hiding under the menu */
+        main, .content {
+        padding-bottom: 70px;  
+        }
+
+
+        
+        .vendor-view .nav-item.active {
+            --nav-active-color: #e74c3c;
+        }
+        
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 5px;
+            font-size: 20px;
+            position: relative;
+        }
+        
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="screen">
+            <div class="status-bar">
+                <div class="time">9:41</div>
+                <div class="battery">
+                    <span>100%</span>
+                    <span>🔋</span>
+                </div>
+            </div>
+            
+            <div class="view-switcher">
+                <div class="view-option active" onclick="switchView('customer')">
+                    👥 Customer View
+                </div>
+                <div class="view-option" onclick="switchView('vendor')">
+                    🏪 Vendor View
+                </div>
+            </div>
+            
+            <div class="app-content">
+                <!-- Customer View -->
+                <div id="customer-view" class="view-container customer-view">
+                    <div class="customer-header">
+                        <div class="logo">QuickBite</div>
+                        <div class="tagline">Skip the line, savor the time</div>
+                    </div>
+                    
+                    <div class="customer-content">
+                        <div class="quick-stats">
+                            <div class="stat-card">
+                                <div class="stat-number">5</div>
+                                <div class="stat-label">Min Wait</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">23</div>
+                                <div class="stat-label">In Queue</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">89%</div>
+                                <div class="stat-label">Available</div>
+                            </div>
+                        </div>
+                        
+                        <div class="section-title">Featured Cafeteria</div>
+                        <div class="featured-cafeteria">
+                            <div class="cafeteria-name">Lagoon Cafeteria</div>
+                            <div class="cafeteria-status">
+                                <div class="status-dot"></div>
+                                <div class="status-text">Open • Accepting Orders</div>
+                            </div>
+                            <div class="wait-time">⏰ Next pickup: 2:15 PM</div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="showMessage('Opening menu...')">Order Now</button>
+                            <button class="btn btn-secondary" onclick="showMessage('Viewing schedule...')">View Schedule</button>
+                        </div>
+                        
+                        <div class="section-title">Quick Features</div>
+                        <div class="features-grid">
+                            <div class="feature-card" onclick="showMessage('Pre-order feature coming up!')">
+                                <div class="feature-icon">🍽️</div>
+                                <div class="feature-title">Pre-Order</div>
+                                <div class="feature-desc">Order ahead and skip the queue</div>
+                            </div>
+                            <div class="feature-card" onclick="showMessage('Real-time tracking active!')">
+                                <div class="feature-icon">📍</div>
+                                <div class="feature-title">Track Order</div>
+                                <div class="feature-desc">Monitor your order status live</div>
+                            </div>
+                            <div class="feature-card" onclick="showMessage('Scheduling system loaded!')">
+                                <div class="feature-icon">⏰</div>
+                                <div class="feature-title">Time Slots</div>
+                                <div class="feature-desc">Choose your pickup time</div>
+                            </div>
+                            <div class="feature-card" onclick="showMessage('Inventory updated!')">
+                                <div class="feature-icon">📊</div>
+                                <div class="feature-title">Stock Info</div>
+                                <div class="feature-desc">Real-time meal availability</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="floating-order" onclick="showMessage('Quick order starting...')">
+                        🛒
+                        <div class="notification-badge">2</div>
+                    </div>
+                    
+                     <div class="bottom-nav">
+                <div class="nav-item active" onclick="setActive(this); showMessage('Home selected')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item" onclick="setActive(this); showMessage('Browse cafeterias')">
+                <div class="nav-icon">🏪</div>
+                <div class="nav-label">Cafeterias</div>
+                </div>
+                <div class="nav-item" onclick="setActive(this); showMessage('Your orders history')">
+                <div class="nav-icon">📋</div>
+                <div class="nav-label">Orders</div>
+                </div>
+                <div class="nav-item" onclick="setActive(this); showMessage('Account settings')">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Profile</div>
+                </div>
+            </div>
+            </div>
+                
+                <!-- Vendor View -->
+                <div id="vendor-view" class="view-container vendor-view hidden">
+                    <div class="vendor-header">
+                        <div class="vendor-info">
+                            <div class="vendor-details">
+                                <h1>Lagoon Cafeteria</h1>
+                                <div class="vendor-status">
+                                    <div class="status-indicator"></div>
+                                    Open & Accepting Orders
+                                </div>
+                            </div>
+                            <button class="toggle-status" onclick="toggleStatus()">Close</button>
+                        </div>
+                        
+                        <div class="vendor-stats">
+                            <div class="vendor-stat-card">
+                                <div class="stat-number">12</div>
+                                <div class="stat-label">Pending</div>
+                            </div>
+                            <div class="vendor-stat-card">
+                                <div class="stat-number">8</div>
+                                <div class="stat-label">Preparing</div>
+                            </div>
+                            <div class="vendor-stat-card">
+                                <div class="stat-number">5</div>
+                                <div class="stat-label">Ready</div>
+                            </div>
+                            <div class="vendor-stat-card">
+                                <div class="stat-number">₱2,840</div>
+                                <div class="stat-label">Today</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="vendor-content">
+                        <div class="emergency-alert" onclick="showMessage('Emergency mode activated - All orders paused')">
+                            <div class="alert-icon">⚠️</div>
+                            <div class="alert-text">
+                                <strong>Low Stock Alert:</strong> Adobo Rice running low (3 left)
+                            </div>
+                        </div>
+                        
+                        <div class="vendor-action-buttons">
+                            <button class="btn vendor-btn-primary" onclick="showMessage('Batch update started')">Update All Ready</button>
+                            <button class="btn vendor-btn-secondary" onclick="showMessage('Pause new orders')">Pause Orders</button>
+                        </div>
+                        
+                        <div class="section">
+                            <div class="section-header">
+                                <div class="section-title">Active Orders</div>
+                                <div class="section-action" onclick="showMessage('Viewing all orders')">View All</div>
+                            </div>
+                            
+                            <div class="order-item" onclick="updateOrderStatus(this, 'preparing')">
+                                <div class="order-number">15</div>
+                                <div class="order-details">
+                                    <div class="order-customer">Maria Santos</div>
+                                    <div class="order-items">Adobo Rice, Iced Tea</div>
+                                    <div class="order-time">Pickup: 10:45 AM</div>
+                                </div>
+                                <div class="order-status status-pending">Pending</div>
+                            </div>
+                            
+                            <div class="order-item" onclick="updateOrderStatus(this, 'ready')">
+                                <div class="order-number">14</div>
+                                <div class="order-details">
+                                    <div class="order-customer">Juan Dela Cruz</div>
+                                    <div class="order-items">Sisig, Rice, Coke</div>
+                                    <div class="order-time">Pickup: 10:30 AM</div>
+                                </div>
+                                <div class="order-status status-preparing">Preparing</div>
+                            </div>
+                            
+                            <div class="order-item" onclick="completeOrder(this)">
+                                <div class="order-number">13</div>
+                                <div class="order-details">
+                                    <div class="order-customer">Anna Reyes</div>
+                                    <div class="order-items">Chicken Curry, Rice</div>
+                                    <div class="order-time">Pickup: 10:15 AM</div>
+                                    <div class="vendor-stat-card">
+                                    <div class="stat-number">45</div>
+                                    <div class="stat-label">Completed</div>
+                            </div>
+            <script>
+                                        
+    function switchView(view) {
+        const customerView = document.getElementById("customer-view");
+        const vendorView = document.getElementById("vendor-view");
+        const options = document.querySelectorAll(".view-option");
+
+        if (view === "customer") {
+            customerView.classList.remove("hidden");
+            vendorView.classList.add("hidden");
+
+            options[0].classList.add("active");
+            options[1].classList.remove("active");
+        } else {
+            vendorView.classList.remove("hidden");
+            customerView.classList.add("hidden");
+
+            options[1].classList.add("active");
+            options[0].classList.remove("active");
+        }
+    }
+
+    function showMessage(msg) {
+        alert(msg);
+    }
+
+    function toggleStatus() {
+        const statusText = document.querySelector(".vendor-status");
+        const button = document.querySelector(".toggle-status");
+
+        if (statusText.textContent.includes("Open")) {
+            statusText.innerHTML = '<div class="status-indicator" style="background:#c0392b"></div> Closed';
+            button.textContent = "Open";
+        } else {
+            statusText.innerHTML = '<div class="status-indicator"></div> Open & Accepting Orders';
+            button.textContent = "Close";
+        }
+    }
+</script>
+
+
+
