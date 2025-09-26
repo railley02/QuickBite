@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBite System Diagrams</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c5aa0;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #34495e;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        
+        .diagram-section {
+            margin-bottom: 50px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafbfc;
+        }
+        
+        .diagram {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 20px 0;
+            min-height: 400px;
+            position: relative;
+        }
+        
+        /* Context Diagram Styles */
+        .context-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            min-height: 500px;
+        }
+        
+        .entity {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+        
+        .system {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            border: 3px solid #fff;
+        }
+        
+        .arrow {
+            font-size: 24px;
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        /* Data Flow Diagram Styles */
+        .dfd {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 20px;
+            align-items: center;
+            justify-items: center;
+            min-height: 400px;
+        }
+        
+        .process {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #2c3e50;
+            padding: 15px;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: bold;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .datastore {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #8b4513;
+            padding: 15px 25px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Screen Flow Styles */
+        .screen-flow {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        
+        .screen {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #2c3e50;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            width: 150px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            border: 2px solid #fff;
+        }
+        
+        .flow-arrow {
+            font-size: 20px;
+            color: #e74c3c;
+            margin: 10px;
+        }
+        
+        /* Process Flow Styles */
+        .process-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .step {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            color: #2d3436;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 5px 0;
+            width: 300px;
+        }
+        
+        .decision {
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: #2d3436;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 5px 0;
+            width: 250px;
+            transform: rotate(-5deg);
+        }
+        
+        .down-arrow {
+            font-size: 24px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        /* Sitemap Styles */
+        .sitemap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .sitemap-level {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .page {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+        
+        .home-page {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            font-size: 1.1em;
+            padding: 20px 30px;
+        }
+        
+        /* Architecture Diagram Styles */
+        .architecture {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-gap: 15px;
+            align-items: center;
+            justify-items: center;
+            min-height: 300px;
+        }
+        
+        .client {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .api {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .service {
+            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .database {
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .payment {
+            background: linear-gradient(135deg, #55a3ff 0%, #003d82 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .notification {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .arch-arrow {
+            font-size: 18px;
+            color: #2d3436;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .diagram {
+                padding: 15px;
+                min-height: 300px;
+            }
+            
+            .dfd, .architecture {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .screen-flow {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .sitemap-level {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QuickBite System Diagrams</h1>
+        <p style="text-align: center; font-size: 1.1em; color: #7f8c8d; margin-bottom: 40px;">
+            Comprehensive visual representation of the QuickBite pre-order system for PUP Lagoon cafeterias
+        </p>
+
+        <div class="diagram-section">
+            <h2>1. Context Diagram</h2>
+            <p>Shows the QuickBite system boundaries and external entities that interact with it.</p>
+            <div class="diagram">
+                <div class="context-diagram">
+                    <div class="entity">Students</div>
+                    <div class="arrow">→</div>
+                    <div class="system">QuickBite<br>Pre-Order System</div>
+                    <div class="arrow">←</div>
+                    <div class="entity">Cafeteria Staff</div>
+                    <div style="grid-column: 1/-1; margin-top: 20px;">
+                        <div class="entity" style="margin: 10px;">Payment Gateway</div>
+                        <div class="arrow" style="display: inline;">↑</div>
+                        <div class="arrow" style="display: inline;">↓</div>
+                        <div class="entity" style="margin: 10px;">Admin/Management</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="diagram-section">
+            <h2>2. System Architecture Diagram</h2>
+            <p>Client → API → Order Service → Redis/DB → Payment → Notification flow as requested.</p>
+            <div class="diagram">
+                <div class="architecture">
+                    <div class="client">Mobile App<br>(Students)</div>
+                    <div class="arch-arrow">→</div>
+                    <div class="api">REST API<br>Gateway</div>
+                    <div class="arch-arrow">→</div>
+                    <div class="service">Order<br>Service</div>
+                    <div class="arch-arrow">→</div>
+                    
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div class="arch-arrow">↓</div>
+                    <div></div>
+                    <div></div>
+                    
+                    <div class="notification">Push<br>Notifications</div>
+                    <div class="arch-arrow">←</div>
+                    <div class="payment">Payment<br>Processing</div>
+                    <div class="arch-arrow">←</div>
+                    <div class="database">Redis Cache<br>+<br>PostgreSQL</div>
+                    <div class="arch-arrow">←</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="diagram-section">
+            <h2>3. Data Flow Diagram (Level 0)</h2>
+            <p>High-level view of data flow through the QuickBite system.</p>
+            <div class="diagram">
+                <div class="dfd">
+                    <div class="entity">Student</div>
+                    <div class="process">1<br>Process<br>Order</div>
+                    <div class="process">2<br>Manage<br>Inventory</div>
+                    <div class="entity">Staff</div>
+                    
+                    <div class="datastore">D1: Orders</div>
+                    <div class="process">3<br>Handle<br>Payment</div>
+                    <div class="datastore">D2: Menu Items</div>
+                    <div class="process">4<br>Send<br>Notifications</div>
+                    
+                    <div class="datastore">D3: User Accounts</div>
+                    <div class="entity">Payment<br>Gateway</div>
+                    <div class="datastore">D4: Time Slots</div>
+                    <div class="entity">Admin</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="diagram-section">
+            <h2>4. Application Screen Flow</h2>
+            <p>User journey through the mobile application screens.</p>
+            <div class="diagram">
+                <div class="screen-flow">
+                    <div class="screen">Splash<br>Screen</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="screen">Login/<br>Register</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="screen">Main<br>Dashboard</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="screen">Menu<br>Browse</div>
+                    
+                    <div class="flow-arrow">↓</div>
+                    <div class="screen">Order<br>Summary</div>
+                    <div class="flow-arrow">←</div>
+                    <div class="screen">Time Slot<br>Selection</div>
+                    <div class="flow-arrow">←</div>
+                    <div class="screen">Item<br>Details</div>
+                    
+                    <div class="screen">Payment</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="screen">Confirmation</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="screen">Order<br>Tracking</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="screen">Pickup<br>Ready</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="diagram-section">
+            <h2>5. Site Map</h2>
+            <p>Hierarchical structure of the QuickBite application navigation.</p>
+            <div class="diagram">
+                <div class="sitemap">
+                    <div class="sitemap-level">
+                        <div class="page home-page">Home Dashboard</div>
+                    </div>
+                    
+                    <div class="down-arrow">↓</div>
+                    
+                    <div class="sitemap-level">
+                        <div class="page">Menu</div>
+                        <div class="page">My Orders</div>
+                        <div class="page">Profile</div>
+                        <div class="page">Notifications</div>
+                    </div>
+                    
+                    <div class="down-arrow">↓</div>
+                    
+                    <div class="sitemap-level">
+                        <div class="page">Categories</div>
+                        <div class="page">Search</div>
+                        <div class="page">Cart</div>
+                        <div class="page">Order History</div>
+                        <div class="page">Settings</div>
+                        <div class="page">Help</div>
+                    </div>
+                    
+                    <div class="down-arrow">↓</div>
+                    
+                    <div class="sitemap-level">
+                        <div class="page">Item Details</div>
+                        <div class="page">Time Slots</div>
+                        <div class="page">Payment</div>
+                        <div class="page">Tracking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="diagram-section">
+            <h2>6. Process Flow</h2>
+            <p>Step-by-step process flow for placing and fulfilling orders through QuickBite.</p>
+            <div class="diagram">
+                <div class="process-flow">
+                    <div class="step">Student Opens QuickBite App</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Browse Menu & Select Items</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Add Items to Cart</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="decision">Check Available Time Slots</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Select Preferred Pickup Time</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Proceed to Payment</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="decision">Payment Successful?</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Order Confirmed & Queued</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Staff Receives Order Notification</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Staff Prepares Order</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Student Receives Ready Notification</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Student Picks Up Order</div>
+                    <div class="down-arrow">↓</div>
+                    <div class="step">Order Completed</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background-color: #ecf0f1; border-radius: 8px;">
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">Key System Features Illustrated:</h3>
+            <ul style="color: #34495e; line-height: 1.6;">
+                <li><strong>Real-time Inventory Management:</strong> Atomic updates prevent overselling</li>
+                <li><strong>Time Slot Management:</strong> Fair distribution of pickup times within capacity limits</li>
+                <li><strong>Digital Queue System:</strong> Eliminates physical waiting and ensures order fairness</li>
+                <li><strong>Payment Integration:</strong> Secure payment processing with multiple options</li>
+                <li><strong>Push Notifications:</strong> Real-time updates on order status</li>
+                <li><strong>Staff Dashboard:</strong> Efficient order management for cafeteria staff</li>
+                <li><strong>Analytics & Reporting:</strong> Insights for better cafeteria operations</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
