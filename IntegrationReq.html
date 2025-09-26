@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBite Integration Architecture</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .diagram-container {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: auto;
+        }
+        
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin: 30px 0;
+            padding: 20px;
+            background: #edf2f7;
+            border-radius: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-box {
+            width: 30px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .integration-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .integration-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .integration-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .integration-table tr:hover {
+            background: #f7fafc;
+        }
+        
+        .api-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .api-endpoint {
+            background: white;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+        
+        .method.get { background: #48bb78; color: white; }
+        .method.post { background: #4299e1; color: white; }
+        .method.put { background: #ed8936; color: white; }
+        .method.delete { background: #f56565; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QuickBite System Integration Architecture</h1>
+        <p class="subtitle">Polytechnic University of the Philippines - Digital Food Ordering System</p>
+        
+        <div class="diagram-container">
+            <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+                <!-- External Users Layer -->
+                <g id="users-layer">
+                    <rect x="20" y="20" width="1160" height="120" fill="#f0f4ff" stroke="#667eea" stroke-width="2" rx="10"/>
+                    <text x="30" y="45" font-size="14" font-weight="bold" fill="#4a5568">EXTERNAL USERS</text>
+                    
+                    <!-- Student Mobile -->
+                    <rect x="80" y="60" width="140" height="60" fill="#667eea" stroke="#5a67d8" stroke-width="2" rx="8"/>
+                    <text x="150" y="90" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Student Mobile</text>
+                    <text x="150" y="105" text-anchor="middle" fill="white" font-size="11">(iOS/Android)</text>
+                    
+                    <!-- Cafeteria Staff -->
+                    <rect x="280" y="60" width="140" height="60" fill="#667eea" stroke="#5a67d8" stroke-width="2" rx="8"/>
+                    <text x="350" y="90" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Cafeteria Staff</text>
+                    <text x="350" y="105" text-anchor="middle" fill="white" font-size="11">(Web Dashboard)</text>
+                    
+                    <!-- Admin Portal -->
+                    <rect x="480" y="60" width="140" height="60" fill="#667eea" stroke="#5a67d8" stroke-width="2" rx="8"/>
+                    <text x="550" y="90" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Admin Portal</text>
+                    <text x="550" y="105" text-anchor="middle" fill="white" font-size="11">(Web App)</text>
+                    
+                    <!-- POS System -->
+                    <rect x="680" y="60" width="140" height="60" fill="#9f7aea" stroke="#805ad5" stroke-width="2" rx="8"/>
+                    <text x="750" y="90" text-anchor="middle" fill="white" font-size="13" font-weight="bold">POS System</text>
+                    <text x="750" y="105" text-anchor="middle" fill="white" font-size="11">(Hardware)</text>
+                </g>
+                
+                <!-- API Gateway Layer -->
+                <g id="api-gateway">
+                    <rect x="20" y="180" width="1160" height="100" fill="#fff5f7" stroke="#fc8181" stroke-width="2" rx="10"/>
+                    <text x="30" y="205" font-size="14" font-weight="bold" fill="#4a5568">API GATEWAY & LOAD BALANCER</text>
+                    
+                    <rect x="400" y="210" width="400" height="50" fill="#fc8181" stroke="#f56565" stroke-width="2" rx="8"/>
+                    <text x="600" y="240" text-anchor="middle" fill="white" font-size="13" font-weight="bold">API Gateway (NGINX/Kong)</text>
+                    <text x="600" y="255" text-anchor="middle" fill="white" font-size="11">Authentication | Rate Limiting | Load Balancing</text>
+                </g>
+                
+                <!-- Application Services Layer -->
+                <g id="services">
+                    <rect x="20" y="320" width="1160" height="180" fill="#f0fff4" stroke="#48bb78" stroke-width="2" rx="10"/>
+                    <text x="30" y="345" font-size="14" font-weight="bold" fill="#4a5568">MICROSERVICES</text>
+                    
+                    <!-- Order Service -->
+                    <rect x="80" y="360" width="160" height="100" fill="#48bb78" stroke="#38a169" stroke-width="2" rx="8"/>
+                    <text x="160" y="390" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Order Service</text>
+                    <text x="160" y="410" text-anchor="middle" fill="white" font-size="10">• Create Orders</text>
+                    <text x="160" y="425" text-anchor="middle" fill="white" font-size="10">• Order Status</text>
+                    <text x="160" y="440" text-anchor="middle" fill="white" font-size="10">• Queue Management</text>
+                    
+                    <!-- User Service -->
+                    <rect x="280" y="360" width="160" height="100" fill="#48bb78" stroke="#38a169" stroke-width="2" rx="8"/>
+                    <text x="360" y="390" text-anchor="middle" fill="white" font-size="12" font-weight="bold">User Service</text>
+                    <text x="360" y="410" text-anchor="middle" fill="white" font-size="10">• Authentication</text>
+                    <text x="360" y="425" text-anchor="middle" fill="white" font-size="10">• Profile Management</text>
+                    <text x="360" y="440" text-anchor="middle" fill="white" font-size="10">• PUP SSO Integration</text>
+                    
+                    <!-- Payment Service -->
+                    <rect x="480" y="360" width="160" height="100" fill="#48bb78" stroke="#38a169" stroke-width="2" rx="8"/>
+                    <text x="560" y="390" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Payment Service</text>
+                    <text x="560" y="410" text-anchor="middle" fill="white" font-size="10">• Process Payments</text>
+                    <text x="560" y="425" text-anchor="middle" fill="white" font-size="10">• E-Wallet Integration</text>
+                    <text x="560" y="440" text-anchor="middle" fill="white" font-size="10">• Transaction History</text>
+                    
+                    <!-- Inventory Service -->
+                    <rect x="680" y="360" width="160" height="100" fill="#48bb78" stroke="#38a169" stroke-width="2" rx="8"/>
+                    <text x="760" y="390" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Inventory Service</text>
+                    <text x="760" y="410" text-anchor="middle" fill="white" font-size="10">• Stock Management</text>
+                    <text x="760" y="425" text-anchor="middle" fill="white" font-size="10">• Real-time Updates</text>
+                    <text x="760" y="440" text-anchor="middle" fill="white" font-size="10">• Menu Management</text>
+                    
+                    <!-- Notification Service -->
+                    <rect x="880" y="360" width="160" height="100" fill="#48bb78" stroke="#38a169" stroke-width="2" rx="8"/>
+                    <text x="960" y="390" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Notification Service</text>
+                    <text x="960" y="410" text-anchor="middle" fill="white" font-size="10">• Push Notifications</text>
+                    <text x="960" y="425" text-anchor="middle" fill="white" font-size="10">• SMS Gateway</text>
+                    <text x="960" y="440" text-anchor="middle" fill="white" font-size="10">• Email Service</text>
+                </g>
+                
+                <!-- Data Layer -->
+                <g id="data-layer">
+                    <rect x="20" y="540" width="1160" height="120" fill="#fff5dc" stroke="#ed8936" stroke-width="2" rx="10"/>
+                    <text x="30" y="565" font-size="14" font-weight="bold" fill="#4a5568">DATA PERSISTENCE LAYER</text>
+                    
+                    <!-- PostgreSQL -->
+                    <rect x="120" y="580" width="140" height="60" fill="#ed8936" stroke="#dd6b20" stroke-width="2" rx="8"/>
+                    <text x="190" y="610" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PostgreSQL</text>
+                    <text x="190" y="625" text-anchor="middle" fill="white" font-size="10">Primary Database</text>
+                    
+                    <!-- Redis -->
+                    <rect x="320" y="580" width="140" height="60" fill="#ed8936" stroke="#dd6b20" stroke-width="2" rx="8"/>
+                    <text x="390" y="610" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Redis Cache</text>
+                    <text x="390" y="625" text-anchor="middle" fill="white" font-size="10">Session & Queue</text>
+                    
+                    <!-- Message Queue -->
+                    <rect x="520" y="580" width="140" height="60" fill="#ed8936" stroke="#dd6b20" stroke-width="2" rx="8"/>
+                    <text x="590" y="610" text-anchor="middle" fill="white" font-size="12" font-weight="bold">RabbitMQ</text>
+                    <text x="590" y="625" text-anchor="middle" fill="white" font-size="10">Message Queue</text>
+                    
+                    <!-- File Storage -->
+                    <rect x="720" y="580" width="140" height="60" fill="#ed8936" stroke="#dd6b20" stroke-width="2" rx="8"/>
+                    <text x="790" y="610" text-anchor="middle" fill="white" font-size="12" font-weight="bold">File Storage</text>
+                    <text x="790" y="625" text-anchor="middle" fill="white" font-size="10">Images/Documents</text>
+                </g>
+                
+                <!-- External Services -->
+                <g id="external">
+                    <rect x="20" y="700" width="1160" height="80" fill="#f0f0ff" stroke="#4299e1" stroke-width="2" rx="10"/>
+                    <text x="30" y="725" font-size="14" font-weight="bold" fill="#4a5568">EXTERNAL INTEGRATIONS</text>
+                    
+                    <rect x="100" y="730" width="120" height="40" fill="#4299e1" stroke="#3182ce" stroke-width="2" rx="6"/>
+                    <text x="160" y="755" text-anchor="middle" fill="white" font-size="11" font-weight="bold">PUP SSO</text>
+                    
+                    <rect x="250" y="730" width="120" height="40" fill="#4299e1" stroke="#3182ce" stroke-width="2" rx="6"/>
+                    <text x="310" y="755" text-anchor="middle" fill="white" font-size="11" font-weight="bold">GCash API</text>
+                    
+                    <rect x="400" y="730" width="120" height="40" fill="#4299e1" stroke="#3182ce" stroke-width="2" rx="6"/>
+                    <text x="460" y="755" text-anchor="middle" fill="white" font-size="11" font-weight="bold">PayMaya API</text>
+                    
+                    <rect x="550" y="730" width="120" height="40" fill="#4299e1" stroke="#3182ce" stroke-width="2" rx="6"/>
+                    <text x="610" y="755" text-anchor="middle" fill="white" font-size="11" font-weight="bold">SMS Gateway</text>
+                    
+                    <rect x="700" y="730" width="120" height="40" fill="#4299e1" stroke="#3182ce" stroke-width="2" rx="6"/>
+                    <text x="760" y="755" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Firebase FCM</text>
+                </g>
+                
+                <!-- Connection Arrows -->
+                <!-- Users to API Gateway -->
+                <path d="M 150 120 L 150 160 L 500 160 L 500 210" stroke="#667eea" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 350 120 L 350 160 L 550 160 L 550 210" stroke="#667eea" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 550 120 L 550 160 L 600 160 L 600 210" stroke="#667eea" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 750 120 L 750 160 L 700 160 L 700 210" stroke="#9f7aea" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                
+                <!-- API Gateway to Services -->
+                <path d="M 600 260 L 600 290 L 160 290 L 160 360" stroke="#fc8181" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 600 260 L 600 290 L 360 290 L 360 360" stroke="#fc8181" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 600 260 L 600 290 L 560 290 L 560 360" stroke="#fc8181" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 600 260 L 600 290 L 760 290 L 760 360" stroke="#fc8181" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 600 260 L 600 290 L 960 290 L 960 360" stroke="#fc8181" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                
+                <!-- Services to Data Layer -->
+                <path d="M 160 460 L 160 520 L 190 520 L 190 580" stroke="#48bb78" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 360 460 L 360 520 L 390 520 L 390 580" stroke="#48bb78" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 560 460 L 560 520 L 590 520 L 590 580" stroke="#48bb78" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 760 460 L 760 520 L 790 520 L 790 580" stroke="#48bb78" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                
+                <!-- Arrow marker definition -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+                        <polygon points="0 0, 10 5, 0 10" fill="#4a5568"/>
+                    </marker>
+                </defs>
+            </svg>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background: #667eea;"></div>
+                <span>User Interface Layer</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #fc8181;"></div>
+                <span>API Gateway</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #48bb78;"></div>
+                <span>Application Services</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #ed8936;"></div>
+                <span>Data Layer</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #4299e1;"></div>
+                <span>External Services</span>
+            </div>
+        </div>
+        
+        <h2 style="color: #2d3748; margin-top: 40px;">Integration Requirements Matrix</h2>
+        
+        <table class="integration-table">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Integration Type</th>
+                    <th>Protocol/Interface</th>
+                    <th>Data Format</th>
+                    <th>Error Handling</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Mobile App</strong></td>
+                    <td>REST API</td>
+                    <td>HTTPS/TLS 1.3</td>
+                    <td>JSON</td>
+                    <td>Retry with exponential backoff</td>
+                </tr>
+                <tr>
+                    <td><strong>Web Dashboard</strong></td>
+                    <td>WebSocket + REST</td>
+                    <td>WSS/HTTPS</td>
+                    <td>JSON</td>
+                    <td>Real-time fallback to polling</td>
+                </tr>
+                <tr>
+                    <td><strong>PUP SSO</strong></td>
+                    <td>OAuth 2.0</td>
+                    <td>SAML/OAuth</td>
+                    <td>JWT Token</td>
+                    <td>Token refresh mechanism</td>
+                </tr>
+                <tr>
+                    <td><strong>Payment Gateway</strong></td>
+                    <td>External API</td>
+                    <td>HTTPS</td>
+                    <td>JSON/XML</td>
+                    <td>Transaction rollback</td>
+                </tr>
+                <tr>
+                    <td><strong>POS System</strong></td>
+                    <td>Direct Integration</td>
+                    <td>TCP/IP Socket</td>
+                    <td>Custom Protocol</td>
+                    <td>Queue-based retry</td>
+                </tr>
+                <tr>
+                    <td><strong>SMS Gateway</strong></td>
+                    <td>External API</td>
+                    <td>HTTPS</td>
+                    <td>JSON</td>
+                    <td>Fallback to email</td>
+                </tr>
+                <tr>
+                    <td><strong>Database</strong></td>
+                    <td>Direct Connection</td>
+                    <td>PostgreSQL Protocol</td>
+                    <td>SQL</td>
+                    <td>Connection pooling & retry</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="api-section">
+            <h3 style="color: #2d3748;">Core API Endpoints</h3>
+            
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/v1/orders</strong> - Create new food order
+            </div>
+            
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/v1/orders/{orderId}</strong> - Get order status
+            </div>
+            
+            <div class="api-endpoint">
+                <span class="method put">PUT</span>
+                <strong>/api/v1/orders/{orderId}/status</strong> - Update order status
+            </div>
+            
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/v1/inventory</strong> - Get available menu items
+            </div>
+            
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/v1/payments</strong> - Process payment transaction
+            </div>
+            
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <strong>/api/v1/queue/status</strong> - Get current queue information
+            </div>
+            
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <strong>/api/v1/auth/login</strong> - Authenticate user via PUP SSO
+            </div>
+        </div>
+        
+        <div class="api-section">
+            <h3 style="color: #2d3748;">Error Handling & Validation</h3>
+            <ul style="color: #4a5568; line-height: 1.8;">
+                <li><strong>Input Validation:</strong> All API inputs validated against JSON Schema before processing</li>
+                <li><strong>Rate Limiting:</strong> 100 requests per minute per user, 1000 per IP</li>
+                <li><strong>Circuit Breaker:</strong> Automatic service isolation after 5 consecutive failures</li>
+                <li><strong>Error Codes:</strong> Standardized HTTP status codes with detailed error messages</li>
+                <li><strong>Logging:</strong> Centralized logging with ELK stack for monitoring and debugging</li>
+                <li><strong>Atomic Operations:</strong> Database transactions ensure data consistency</li>
+                <li><strong>Idempotency:</strong> POST requests use idempotency keys to prevent duplicates</li>
+            </ul>
+        </div>
+        
+        <div class="api-section" style="background: #f8fff8; border-left-color: #48bb78;">
+            <h3 style="color: #2d3748;">Data Flow Sequence</h3>
+            <ol style="color: #4a5568; line-height: 1.8;">
+                <li><strong>Student Authentication:</strong> Login via PUP SSO → JWT token generation → Session management</li>
+                <li><strong>Order Placement:</strong> Menu selection → Inventory check → Time slot assignment → Payment processing</li>
+                <li><strong>Queue Management:</strong> Order confirmation → Queue position → Real-time updates → Ready notification</li>
+                <li><strong>Order Fulfillment:</strong> Kitchen display update → Preparation tracking → Pickup verification</li>
+                <li><strong>Feedback Loop:</strong> Order completion → Rating collection → Analytics processing</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
